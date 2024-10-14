@@ -25,6 +25,14 @@ class Camera {
     
   }
   
+  void LoadPixels(){
+    loadPixels();
+  }
+  
+  void UpdatePixels(){
+    updatePixels();
+  }
+  
   void changeTheta(float deltaTheta){
     theta+=deltaTheta;
     sinTheta=sin(theta);
@@ -94,10 +102,11 @@ class Camera {
   }
   
   Pixel renderPoint(Point point){
-    strokeWeight(5);
     Pixel tempPixel;
     tempPixel = findPointRender(point);
-    point(tempPixel.x, tempPixel.y);
+    drawPixel(tempPixel, 4);
+    strokeWeight(5);
+    //point(tempPixel.x, tempPixel.y);
     return tempPixel;
   }
   
@@ -107,16 +116,54 @@ class Camera {
       return;
     }
     strokeWeight(1);
-    renderQuad(cube.points.get(3), cube.points.get(7), cube.points.get(5), cube.points.get(1));//back
-    renderQuad(cube.points.get(1), cube.points.get(0), cube.points.get(2), cube.points.get(3));//left
-    renderQuad(cube.points.get(2), cube.points.get(6), cube.points.get(7), cube.points.get(3));//top
-    renderQuad(cube.points.get(7), cube.points.get(5), cube.points.get(4), cube.points.get(6));//right
-    renderQuad(cube.points.get(0), cube.points.get(1), cube.points.get(5), cube.points.get(4));//bottom
-    renderQuad(cube.points.get(0), cube.points.get(2), cube.points.get(6), cube.points.get(4));//front
+    /*drawQuad(cube.points.get(3), cube.points.get(7), cube.points.get(5), cube.points.get(1));//back
+    drawQuad(cube.points.get(1), cube.points.get(0), cube.points.get(2), cube.points.get(3));//left
+    drawQuad(cube.points.get(2), cube.points.get(6), cube.points.get(7), cube.points.get(3));//top
+    drawQuad(cube.points.get(7), cube.points.get(5), cube.points.get(4), cube.points.get(6));//right
+    drawQuad(cube.points.get(0), cube.points.get(1), cube.points.get(5), cube.points.get(4));//bottom
+    drawQuad(cube.points.get(0), cube.points.get(2), cube.points.get(6), cube.points.get(4));//front*/
+    renderPoint(cube.points.get(1));
+    renderPoint(cube.points.get(2));
+    //renderPoint(cube.points.get(3));
+    connectPoints(cube.points.get(1), cube.points.get(2));
   }
   
-  void renderQuad(Point point1, Point point2, Point point3, Point point4){
-    fill(0, 0, 255, 0);
-    quad(findPointRender(point1).x, findPointRender(point1).y, findPointRender(point2).x, findPointRender(point2).y, findPointRender(point3).x, findPointRender(point3).y, findPointRender(point4).x, findPointRender(point4).y);
+  void connectPoints(Point point1, Point point2){
+    Pixel pixel1 = findPointRender(point1);
+    Pixel pixel2 = findPointRender(point2);
+    connectPixels(pixel1, pixel2);
   }
+  
+  void connectPixels(Pixel pixel1, Pixel pixel2){
+    int deltaX = pixel2.x - pixel1.x;
+    int deltaY = pixel2.y - pixel1.y;
+    float slope = deltaY / float(deltaX);
+    for(int i = 0; i<abs(deltaX); i++){
+      for(int j = 0; j < abs(slope); j++){
+      Pixel tempPixel = new Pixel(pixel1.x+i, int(pixel1.y+i*slope+j), pixel1.z);
+      drawPixel(tempPixel, 4);
+      }
+    }
+  }
+  
+  void drawPixel(Pixel pixel, int strokeWeight){
+    if (pixel.z > 0){
+      for(int i = 0; i < strokeWeight; i++){
+        for(int j = 0; j < strokeWeight; j++){
+          if(pixel.y<=height&&pixel.y>0&&pixel.x>0&&pixel.x<=width){
+            if((pixel.y-1+i)*width+pixel.x+j<pixels.length){
+            pixels[(pixel.y-1+i)*width+pixel.x+j] = pixel.pixelColor;}
+          }
+        }
+      }
+    }
+  }
+  
+  void drawQuad(Point point1, Point point2, Point point3, Point point4){
+  //  connectPoints(point1, point2);
+   // connectPoints(point2, point3);
+    //connectPoints(point3, point4);
+    //connectPoints(point4, point1);
+  }
+  
 }

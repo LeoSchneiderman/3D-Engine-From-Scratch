@@ -20,7 +20,7 @@ void mouseDragged(){
 
 
 void setup(){
-  fullScreen();
+  size(600, 600);
   frameRate(60);
   
   for(int i = 0; i<8; i++){
@@ -35,6 +35,7 @@ void draw(){
   deltaMouseX = mouseX - mousex;
   
   background(255);
+  camera1.LoadPixels();
   camera1.renderPoint(point1);
   for(int i=0;i<64;i++){
     camera1.renderCube(cubes.get(i));
@@ -42,4 +43,5 @@ void draw(){
   
   mousey = mouseY;
   mousex = mouseX;
+  camera1.UpdatePixels();
 }
